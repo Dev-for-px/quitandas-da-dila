@@ -215,7 +215,15 @@
   .acoes .qd-botao { width: auto; }
 }
 .hero__foto { position: relative; margin-inline: auto; width: 100%; max-width: 480px; }
-.hero__foto img { width: 100%; aspect-ratio: 5 / 4; object-fit: cover; border-radius: var(--raio-lg); box-shadow: var(--sombra-cartao); }
+.hero__foto img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: var(--raio-lg); box-shadow: var(--sombra-cartao); }
+/* Celular: capa enxuta para caber título, foto, opções e botão na primeira tela */
+@media (max-width: 899px) {
+  .hero { gap: var(--espaco-4); padding-top: 0; padding-bottom: var(--espaco-6); }
+  .hero__texto { gap: var(--espaco-3); }
+  .hero .qd-titulo-produto__linha { font-size: 28px; line-height: 34px; }
+  .hero .qd-titulo-produto__destaque { font-size: 72px; }
+  .topo { padding-top: var(--espaco-2); padding-bottom: 0; }
+}
 .hero__foto .qd-selo--redondo { position: absolute; right: -6px; bottom: -18px; }
 @media (min-width: 900px) {
   .hero { grid-template-columns: 1.1fr 0.9fr; align-items: center; gap: var(--espaco-8); padding-top: var(--espaco-5); padding-bottom: var(--espaco-8); }

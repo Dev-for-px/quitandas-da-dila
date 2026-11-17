@@ -14,7 +14,7 @@ export function Topo({ telefone }: { telefone: string }) {
     <header className="topo envelope">
       <Link href="/" className="topo__logo" aria-label="Quitandas da Dila — início">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/img/logo-240.webp" srcSet="/img/logo-240.webp 1x, /img/logo-480.webp 2x" width={120} height={120} alt="Quitandas da Dila" className="h-[88px] w-[88px] md:h-[120px] md:w-[120px]" />
+        <img src="/img/logo-240.webp" srcSet="/img/logo-240.webp 1x, /img/logo-480.webp 2x" width={120} height={120} alt="Quitandas da Dila" className="h-[72px] w-[72px] md:h-[120px] md:w-[120px]" />
       </Link>
       <nav className="topo__nav" aria-label="Seções">
         {LINKS.map((l) => <Link key={l.href} href={l.href}>{l.label}</Link>)}

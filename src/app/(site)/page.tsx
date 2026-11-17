@@ -33,7 +33,7 @@ export default async function Home() {
       <JsonLd data={catalogoJsonLd(secoes, mp)} />
       {faq.length > 0 && <JsonLd data={faqJsonLd(faq)} />}
 
-      {/* CAPA */}
+      {/* CAPA — no celular: título, foto, as duas opções e um botão só (Ligar/WhatsApp ficam na barra de baixo) */}
       <section className="hero envelope">
         <div className="hero__texto">
           <div className="qd-faixa">
@@ -44,20 +44,35 @@ export default async function Home() {
             <span className="qd-titulo-produto__destaque">Minas</span>
             <span className="sr-only"> – pão de queijo e biscoito de queijo da Quitandas da Dila em Pompéu – MG</span>
           </h1>
-          <p className="hero__lead">
+          <p className="hero__lead hidden min-[900px]:block">
             Pão de queijo e biscoito de queijo feitos à mão em Pompéu. Congelados todos os dias, ou quentinhos saindo do forno no horário que você marcar.
           </p>
-          <div className="acoes">
+          <div className="acoes hidden min-[900px]:flex">
             <BotaoLigar grande numero={config.telefone} />
             <Link href="#linha-mineira" className="qd-botao qd-botao--secundario qd-botao--lg">
               <Icone nome="encomenda" tamanho={22} /><span>Montar minha encomenda</span>
             </Link>
           </div>
-          <p className="nota">Para um atendimento mais rápido, a Dila prefere ligação.</p>
+          <p className="nota hidden min-[900px]:block">Para um atendimento mais rápido, a Dila prefere ligação.</p>
         </div>
         <div className="hero__foto">
           <Foto url="/img/pao-de-queijo-assado-900.webp" alt="Assadeira de pães de queijo dourados saindo do forno da Dila" prioridade />
-          <span className="qd-selo qd-selo--redondo qd-selo--cafe"><Icone nome="congelado" tamanho={26} />Congelado pronta entrega</span>
+          <span className="qd-selo qd-selo--redondo qd-selo--cafe hidden min-[900px]:flex"><Icone nome="congelado" tamanho={26} />Congelado pronta entrega</span>
+        </div>
+        <div className="flex flex-col gap-3 min-[900px]:hidden">
+          <ul className="grid grid-cols-2 gap-2 text-left">
+            <li className="flex items-center gap-2 rounded-md bg-creme px-3 py-2.5">
+              <Icone nome="congelado" tamanho={24} className="shrink-0 text-cafe" />
+              <span className="text-[13px] leading-tight text-cafe"><b className="block text-[15px]">Congelado</b>pronta entrega todo dia</span>
+            </li>
+            <li className="flex items-center gap-2 rounded-md bg-creme px-3 py-2.5">
+              <Icone nome="forno" tamanho={24} className="shrink-0 text-terra" />
+              <span className="text-[13px] leading-tight text-cafe"><b className="block text-[15px]">Assado</b>na hora que você marcar</span>
+            </li>
+          </ul>
+          <Link href="#linha-mineira" className="qd-botao qd-botao--primario qd-botao--lg w-full">
+            <Icone nome="encomenda" tamanho={22} /><span>Montar encomenda</span>
+          </Link>
         </div>
       </section>
 
