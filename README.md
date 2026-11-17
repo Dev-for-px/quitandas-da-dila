@@ -1,27 +1,18 @@
 # Quitandas da Dila — site
 
-Landing page (vitrine) da Quitandas da Dila, Pompéu – MG. Feita em Next.js, mobile first, com o Design System da marca (cores, fontes Great Vibes / Playfair Display / Montserrat, ícones e componentes).
+Site com encomenda da Quitandas da Dila (Pompéu – MG): o cliente escolhe congelado ou assado, marca dia e horário, escolhe retirada ou entrega e envia a encomenda pronta no WhatsApp — ou liga. Tem painel (`/admin`) para a Dila mudar preços, produtos, fotos, taxa de entrega e textos.
+
+- Next.js + TypeScript + Tailwind + Supabase
+- Design System oficial da marca (Great Vibes / Playfair Display / Montserrat)
 
 ## Rodar no computador
-
 ```bash
 npm install
-npm run dev
+cp .env.example .env.local   # preencha a publishable key do Supabase
+npm run dev                  # http://localhost:3000
 ```
 
-Abra http://localhost:3000
-
-## Onde mudar as coisas
-
-| O quê | Arquivo |
-| --- | --- |
-| Telefone, Instagram, endereço, mensagem do WhatsApp | `lib/contato.ts` |
-| Textos e seções da página | `app/page.tsx` |
-| Cartões de Pão de Queijo / Biscoito (assado ↔ congelado) | `components/ProdutoMineiro.tsx` |
-| Cores, tamanhos e espaçamentos (tokens do Design System) | `app/globals.css` |
-| Título do Google, descrição e dados de empresa local (schema.org) | `app/layout.tsx` |
-| Fotos | `public/img/` (WebP em 480 e 900 px) |
-
 ## Publicar
+Cada `git push` na `main` publica na Vercel. Variáveis obrigatórias na Vercel: `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 
-Cada `git push` na branch `main` publica automaticamente na Vercel.
+Detalhes técnicos em `CLAUDE.md`. Status em `docs/status-projeto.md`.
