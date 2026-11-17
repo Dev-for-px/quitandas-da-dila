@@ -10,7 +10,16 @@ import { Icone } from "./Icone";
 import { Quantidade } from "./Quantidade";
 
 const CHAVE_CLIENTE = "dila:cliente";
-const VAZIO: DadosCliente = { nome: "", tipo: "retirada", data: "", hora: "", endereco: "", referencia: "", pagamento: "", troco: "", obs: "" };
+const VAZIO: DadosCliente = { nome: "", telefone: "", tipo: "retirada", data: "", hora: "", endereco: "", referencia: "", pagamento: "", troco: "", obs: "" };
+
+/** (37) 99999-9999 enquanto digita */
+function mascaraTelefone(v: string) {
+  const d = v.replace(/\D/g, "").replace(/^55(?=\d{10,11}$)/, "").slice(0, 11);
+  if (d.length <= 2) return d.length ? `(${d}` : "";
+  if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
 
 function hojeSP() {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());
@@ -21,6 +30,7 @@ export function Checkout({ formasPagamento }: { formasPagamento: string[] }) {
   const [dados, setDados] = useState<DadosCliente>(VAZIO);
   const [tentou, setTentou] = useState(false);
   const [hoje, setHoje] = useState("");
+  const [linkAberto, setLinkAberto] = useState<string | null>(null);
 
   useEffect(() => {
     // Lembra nome e endereço do cliente neste aparelho.
@@ -30,39 +40,44 @@ export function Checkout({ formasPagamento }: { formasPagamento: string[] }) {
       const salvo = localStorage.getItem(CHAVE_CLIENTE);
       if (salvo) {
         const s = JSON.parse(salvo);
-        setDados({ ...VAZIO, nome: s.nome ?? "", endereco: s.endereco ?? "", referencia: s.referencia ?? "", pagamento: s.pagamento ?? "" });
+        setDados({ ...VAZIO, nome: s.nome ?? "", telefone: s.telefone ?? "", endereco: s.endereco ?? "", referencia: s.referencia ?? "", pagamento: s.pagamento ?? "" });
       }
     } catch {}
   }, []);
 
   const set = <K extends keyof DadosCliente>(k: K, v: DadosCliente[K]) => setDados((d) => ({ ...d, [k]: v }));
   const entrega = c.config.aceitaEntrega && dados.tipo === "entrega";
-  // Assado, bolos e entrega são sempre por encomenda: precisa do dia e do horário.
-  const precisaHorario = c.temEncomenda || entrega;
+  // Dia e horário sempre obrigatórios (retirada ou entrega).
   const faltaNome = !dados.nome.trim();
+  const faltaTelefone = dados.telefone.replace(/\D/g, "").length < 10;
   const faltaEndereco = entrega && !dados.endereco.trim();
-  const faltaData = precisaHorario && !dados.data;
-  const faltaHora = precisaHorario && !dados.hora;
+  const faltaData = !dados.data;
+  const faltaHora = !dados.hora;
   const taxa = entrega ? c.config.taxaEntrega : null;
   const total = c.subtotal != null ? c.subtotal + (taxa ?? 0) : null;
   const abaixoMinimo = entrega && c.config.mostrarPrecos && c.config.pedidoMinimo != null && c.subtotal != null && c.subtotal < c.config.pedidoMinimo;
 
   function enviar() {
     setTentou(true);
-    if (faltaNome || faltaEndereco || faltaData || faltaHora || c.config.pausado) {
+    if (faltaNome || faltaTelefone || faltaEndereco || faltaData || faltaHora || c.config.pausado) {
       setTimeout(() => document.querySelector("[data-erro]")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
       return;
     }
     const texto = montarMensagem(c.itens, { ...dados, tipo: entrega ? "entrega" : "retirada" }, c.config.mostrarPrecos, c.config.taxaEntrega);
     try {
-      localStorage.setItem(CHAVE_CLIENTE, JSON.stringify({ nome: dados.nome, endereco: dados.endereco, referencia: dados.referencia, pagamento: dados.pagamento }));
+      localStorage.setItem(CHAVE_CLIENTE, JSON.stringify({ nome: dados.nome, telefone: dados.telefone, endereco: dados.endereco, referencia: dados.referencia, pagamento: dados.pagamento }));
     } catch {}
     registrar("enviar_pedido", `${c.totalItens} itens · ${entrega ? "entrega" : "retirada"}`);
     c.salvarUltimo();
+    // Sempre em nova aba: o cliente nunca sai do site.
     const url = linkWhatsApp(texto, c.config.whatsapp);
     const aba = window.open(url, "_blank");
-    if (aba) aba.opener = null;
-    else window.location.assign(url);
+    if (aba) {
+      aba.opener = null;
+      setLinkAberto(null);
+    } else {
+      setLinkAberto(url); // navegador bloqueou: mostra o botão para abrir em nova aba
+    }
   }
 
   if (c.itens.length === 0) {
@@ -152,10 +167,8 @@ export function Checkout({ formasPagamento }: { formasPagamento: string[] }) {
         )}
 
         <fieldset>
-          <legend className="font-bold">
-            {precisaHorario ? (entrega ? "Para quando é a entrega?" : "Para quando é a encomenda?") : <>Quando você vem buscar? <span className="font-normal text-muted">(opcional)</span></>}
-          </legend>
-          {precisaHorario && <p className="text-sm text-muted">{c.temEncomenda ? "Assado e bolos são feitos por encomenda: marque o dia e o horário." : "Entrega é por encomenda: marque o dia e o horário."}</p>}
+          <legend className="font-bold">{entrega ? "Para quando é a entrega?" : "Quando você vem buscar?"}</legend>
+          <p className="text-sm text-muted">{c.temEncomenda || entrega ? "Assado, bolos e entrega são por encomenda: a Dila prepara para o dia e o horário marcados." : "Marque o dia e o horário para a Dila separar sua encomenda."}</p>
           <div className="mt-2 grid grid-cols-2 gap-3">
             <label className="block">
               <span className="text-sm font-semibold">Dia</span>
@@ -177,6 +190,11 @@ export function Checkout({ formasPagamento }: { formasPagamento: string[] }) {
           <span className="font-bold">Seu nome</span>
           <input value={dados.nome} onChange={(e) => set("nome", e.target.value)} autoComplete="name" className={campo} />
           {tentou && faltaNome && erro("Digite seu nome")}
+        </label>
+        <label className="block">
+          <span className="font-bold">Seu telefone (WhatsApp)</span>
+          <input type="tel" inputMode="tel" autoComplete="tel-national" placeholder="(37) 99999-9999" value={dados.telefone} onChange={(e) => set("telefone", mascaraTelefone(e.target.value))} className={campo} />
+          {tentou && faltaTelefone && erro("Digite seu telefone com DDD")}
         </label>
         {formasPagamento.length > 0 && (
           <fieldset>
@@ -224,6 +242,11 @@ export function Checkout({ formasPagamento }: { formasPagamento: string[] }) {
                 <Icone nome="telefone" tamanho={18} /><span>Prefiro ligar para a Dila</span>
               </a>
             </div>
+          )}
+          {linkAberto && (
+            <a href={linkAberto} target="_blank" rel="noopener noreferrer" onClick={() => setLinkAberto(null)} className="mt-2 block rounded-md bg-creme p-3 text-center text-sm font-bold text-cafe underline">
+              O WhatsApp não abriu? Toque aqui para abrir em uma nova aba.
+            </a>
           )}
           {abaixoMinimo && <p className="mt-2 text-center text-xs text-muted">Pedido mínimo para entrega: {formatarPreco(c.config.pedidoMinimo)}</p>}
         </div>

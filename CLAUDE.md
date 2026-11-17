@@ -27,7 +27,8 @@ Cliente da PHAR. Quitandas mineiras da Dirlene (Dila). Site com encomenda: o cli
 ## Encomenda (carrinho → WhatsApp)
 - Estado em `src/lib/carrinho.tsx` (localStorage `dila:*`); mensagem em `src/lib/mensagem.ts`
 - Retirada ou entrega (`configuracoes.aceita_entrega`); entrega é sempre por encomenda, com `taxa_entrega` (soma no total; vazia = "a confirmar")
-- Dia e horário obrigatórios quando há item por encomenda ou entrega
+- Nome, telefone (com DDD), dia e horário são obrigatórios em toda encomenda
+- WhatsApp sempre abre em nova aba (o cliente nunca sai do site)
 - Formas de pagamento só aparecem se cadastradas no painel
 
 ## Painel (/admin)

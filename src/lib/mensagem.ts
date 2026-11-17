@@ -4,6 +4,7 @@ import { formatarPreco } from "./site";
 
 export type DadosCliente = {
   nome: string;
+  telefone: string;   // obrigatório
   tipo: "retirada" | "entrega";
   data: string;       // AAAA-MM-DD (opcional para congelado na retirada)
   hora: string;       // HH:MM
@@ -54,6 +55,7 @@ export function montarMensagem(itens: ItemCarrinho[], cliente: DadosCliente, mos
   linhas.push("");
 
   linhas.push(`*Nome:* ${cliente.nome.trim()}`);
+  linhas.push(`*Telefone:* ${cliente.telefone.trim()}`);
   const q = quando(cliente);
   if (entrega) {
     linhas.push(`*Entrega* (encomenda)${q ? `: ${q}` : ""}`);
